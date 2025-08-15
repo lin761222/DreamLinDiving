@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>霖哥製作-自潛CO2訓練表</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background: linear-gradient(135deg, #0a4d68 0%, #088395 100%);
+            min-height: 100vh;
+            color: white;
+            padding-bottom: 20px;
+        }
+        
+        .timer-display {
+            font-size: 5rem;
+            font-weight: 700;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        @media (max-width: 640px) {
+            .timer-display {
+                font-size: 4.5rem;
+            }
+            
+            .mobile-text-lg {
+                font-size: 1.2rem;
+            }
+            
+            .mobile-text-xl {
+                font-size: 1.5rem;
+            }
+        }
+        
+        .btn {
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn:active {
+            transform: translateY(1px);
+        }
+        
+        .progress-bar {
+            transition: width 1s linear;
+        }
+        
+        .card {
+            backdrop-filter: blur(10px);
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .input-field {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .input-field:focus {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+            outline: none;
+        }
+        
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 8s infinite ease-in-out;
+            z-index: -1;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 0.8; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
+        }
+        
+        .set-card {
+            transition: all 0.3s ease;
+        }
+        
+        .set-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+        
+        .time-adjust-btn {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preset-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .preset-btn:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+        }
+        
+        .preset-btn:active {
+            transform: translateY(1px);
+            filter: brightness(0.9);
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.5);
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .toggle-btn {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-btn input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.2);
+            transition: .4s;
+            border-radius: 24px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: #2196F3;
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        .sets-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+        
+        @media (max-width: 1024px) {
+            .sets-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 640px) {
+            .sets-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        @media (max-width: 768px) {
+            .header-container {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+        
+        .instagram-btn {
+            background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+            color: white;
+            border-radius: 8px;
+            padding: 8px 16px;
+            display: inline-flex;
+            align-items: center;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .instagram-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        
+        .warm-up-toggle {
+            display: inline-flex;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 5px 10px;
+            margin-right: 10px;
+        }
+        
+        .footer-log {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .settings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .settings-item {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .warmup-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 4px 10px;
+            margin-left: 5px;
+            transition: all 0.2s ease;
+        }
+        
+        .warmup-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .warmup-btn.active {
+            background-color: #2196F3;
+            border-color: #2196F3;
+        }
+        
+        .interval-display {
+            min-width: 30px;
+            text-align: center;
+            padding: 0 5px;
+        }
+        
+        .collapsible-header {
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        
+        .collapsible-header:hover {
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .collapsible-content.open {
+            max-height: 1000px;
+        }
+        
+        .instruction-list {
+            list-style-type: decimal;
+            padding-left: 1.5rem;
+        }
+        
+        .instruction-list li {
+            margin-bottom: 0.5rem;
+        }
+        
+        .sync-btn {
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            padding: 6px 12px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .sync-btn:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .sync-btn.active {
+            background-color: #2196F3;
+            border-color: #2196F3;
+        }
+        
+        .time-input {
+            width: 60px;
+            text-align: center;
+            background-color: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            padding: 2px 4px;
+            color: white;
+        }
+        
+        .time-input:focus {
+            outline: none;
+            border-color: #2196F3;
+            background-color: rgba(255, 255, 255, 0.15);
+        }
+        
+        .alert-banner {
+            background-color: rgba(255, 193, 7, 0.2);
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin-bottom: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            animation: pulse-alert 2s infinite;
+        }
+        
+        @keyframes pulse-alert {
+            0% {
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(255, 193, 7, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
+            }
+        }
+    </style>
+</head>
+<body class="p-4">
+    <!-- Decorative bubbles -->
+    <div id="bubbles"></div>
+    
+    <div class="max-w-6xl mx-auto">
+        <!-- Header with title and Instagram -->
+        <div class="header-container mb-6">
+            <div>
+                <h1 class="text-3xl md:text-4xl font-bold">自由潛水 CO2 Table</h1>
+                <p class="text-sm md:text-lg opacity-80">霖哥製作</p>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="text-sm md:text-base">如果喜歡這功能記得追蹤</span>
+                <a href="https://www.instagram.com/dreamlin76/" target="_blank" class="instagram-btn">
+                    <i class="fab fa-instagram mr-2"></i> @dreamlin76
+                </a>
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div id="settingsSection" class="card rounded-xl p-4 col-span-1 md:col-span-2">
+                <!-- Browser Alert Banner -->
+                <div class="alert-banner mb-4">
+                    <i class="fas fa-exclamation-triangle text-yellow-400 text-xl mr-3"></i>
+                    <div>
+                        <p class="font-bold">重要提醒：</p>
+                        <p>請複製網址或額外開啟使用"預設瀏覽器開啟"才會有"語音功能"</p>
+                    </div>
+                </div>
+                
+                <!-- Instructions Section -->
+                <div class="mb-4">
+                    <div class="collapsible-header" id="instructionsHeader">
+                        <h2 class="text-lg font-semibold">使用說明</h2>
+                        <div class="flex items-center">
+                            <span class="text-sm mr-2">點擊即可縮合</span>
+                            <i class="fas fa-chevron-up"></i>
+                        </div>
+                    </div>
+                    <div class="collapsible-content open" id="instructionsContent">
+                        <div class="p-4 bg-black bg-opacity-20 rounded-lg">
+                            <p class="mb-2">這是一個自由潛水員的二氧化碳耐受度練習表</p>
+                            <p class="mb-3">由 <a href="https://www.instagram.com/dreamlin76/" target="_blank" class="text-blue-300 hover:underline">@dreamlin76</a> 霖哥製作</p>
+                            
+                            <ol class="instruction-list">
+                                <li>首先決定你是否需要調息，調息時間可為1分鐘或2分鐘（如不用調息可取消）</li>
+                                <li>第一次使用可以直接點擊"初學組"或"進階組"，會有配置好的時間和組數可直接練習</li>
+                                <li>點擊"同步休息"或"同步閉氣"可以方便您調整時間</li>
+                                <li>如果你在閉氣過程中不希望被打擾，提醒間隔可以設置為0</li>
+                                <li>目前組數設置最少四組最多八組</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Training Settings Section -->
+                <div class="mb-4">
+                    <div class="collapsible-header" id="settingsHeader">
+                        <h2 class="text-lg font-semibold">訓練設置</h2>
+                        <div class="flex items-center">
+                            <span class="text-sm mr-2">點擊即可縮合</span>
+                            <i class="fas fa-chevron-up"></i>
+                        </div>
+                    </div>
+                    <div class="collapsible-content open" id="settingsContent">
+                        <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                            <div class="flex items-center">
+                                <div class="warm-up-toggle">
+                                    <span class="mr-2 text-sm">調息組:</span>
+                                    <label class="toggle-btn">
+                                        <input type="checkbox" id="warmUpEnabled" checked>
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <div class="flex gap-1 ml-2">
+                                        <button id="warmup60Btn" class="warmup-btn">1分</button>
+                                        <button id="warmup120Btn" class="warmup-btn active">2分</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="flex gap-2 flex-wrap">
+                                <button id="presetBtnA2" class="preset-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-sm">
+                                    初學組 (A2)
+                                </button>
+                                <button id="presetBtnA3" class="preset-btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-3 rounded-lg text-sm">
+                                    進階組 (A3)
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-grid">
+                            <div class="settings-item">
+                                <button id="syncRestBtn" class="sync-btn">
+                                    <i class="fas fa-sync-alt"></i>
+                                    <span>同步所有休息時間</span>
+                                </button>
+                            </div>
+                            
+                            <div class="settings-item">
+                                <button id="syncHoldBtn" class="sync-btn">
+                                    <i class="fas fa-sync-alt"></i>
+                                    <span>同步所有閉氣時間</span>
+                                </button>
+                            </div>
+                            
+                            <div class="settings-item">
+                                <div class="flex items-center w-full">
+                                    <span class="mr-2">提醒間隔:</span>
+                                    <div class="flex items-center">
+                                        <button id="decreaseReminderBtn" class="time-adjust-btn btn bg-purple-700 hover:bg-purple-800 text-white rounded-l-lg">-</button>
+                                        <span id="reminderIntervalDisplay" class="interval-display bg-opacity-20 bg-white">30</span>
+                                        <button id="increaseReminderBtn" class="time-adjust-btn btn bg-purple-700 hover:bg-purple-800 text-white rounded-r-lg">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sets Section -->
+                <div class="mb-4">
+                    <div class="collapsible-header" id="setsHeader">
+                        <h2 class="text-lg font-semibold">訓練組數</h2>
+                        <div class="flex items-center">
+                            <span class="text-sm mr-2">點擊即可縮合</span>
+                            <i class="fas fa-chevron-up"></i>
+                        </div>
+                    </div>
+                    <div class="collapsible-content open" id="setsContent">
+                        <div id="setsContainer" class="sets-grid mb-3 mt-4">
+                            <!-- Sets will be added here dynamically -->
+                        </div>
+                        
+                        <div class="mt-3">
+                            <button id="addSetBtn" class="btn bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg">
+                                <i class="fas fa-plus mr-1"></i> 新增組數
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="timerSection" class="card rounded-xl p-4">
+                <div class="text-center">
+                    <div class="timer-display mb-2" id="timerDisplay">00:00</div>
+                    <div class="text-lg mb-1 mobile-text-xl" id="stateDisplay">準備開始</div>
+                    <div class="text-sm mb-2 mobile-text-lg" id="progressDisplay">組數: 0 / 4</div>
+                    <div class="text-xs mb-3 mobile-text-lg" id="totalTimeDisplay">總剩餘時間: 00:00</div>
+                    
+                    <div class="w-full bg-gray-700 rounded-full h-3 mb-4">
+                        <div class="bg-blue-500 h-3 rounded-full progress-bar" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    
+                    <div class="flex justify-center gap-2 mb-4">
+                        <button id="startBtn" class="btn bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-6 rounded-lg pulse-animation">
+                            <i class="fas fa-play mr-1"></i> 開始
+                        </button>
+                    </div>
+                    
+                    <div id="skipWarmUpBtnContainer" class="mb-4" style="display: none;">
+                        <button id="skipWarmUpBtn" class="btn bg-yellow-600 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded-lg">
+                            跳過調息
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer with training log -->
+        <div id="logSection" class="footer-log">
+            <div class="collapsible-header" id="logHeader">
+                <h3 class="text-md font-semibold">訓練記錄</h3>
+                <div class="flex items-center">
+                    <span class="text-sm mr-2">點擊即可縮合</span>
+                    <i class="fas fa-chevron-up"></i>
+                </div>
+            </div>
+            <div class="collapsible-content open" id="logContent">
+                <div id="trainingLog" class="space-y-1 max-h-32 overflow-y-auto text-sm">
+                    <div class="text-center text-gray-300">尚無訓練記錄</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Create bubbles
+        function createBubbles() {
+            const bubblesContainer = document.getElementById('bubbles');
+            const bubbleCount = 15;
+            
+            for (let i = 0; i < bubbleCount; i++) {
+                const bubble = document.createElement('div');
+                bubble.classList.add('bubble');
+                
+                const size = Math.random() * 100 + 20;
+                const left = Math.random() * 100;
+                const delay = Math.random() * 15;
+                const duration = Math.random() * 10 + 5;
+                
+                bubble.style.width = `${size}px`;
+                bubble.style.height = `${size}px`;
+                bubble.style.left = `${left}%`;
+                bubble.style.bottom = `-${size}px`;
+                bubble.style.animationDelay = `${delay}s`;
+                bubble.style.animationDuration = `${duration}s`;
+                
+                bubblesContainer.appendChild(bubble);
+            }
+        }
+        
+        createBubbles();
+        
+        // DOM Elements
+        const timerDisplay = document.getElementById('timerDisplay');
+        const stateDisplay = document.getElementById('stateDisplay');
+        const progressDisplay = document.getElementById('progressDisplay');
+        const totalTimeDisplay = document.getElementById('totalTimeDisplay');
+        const progressBar = document.getElementById('progressBar');
+        const startBtn = document.getElementById('startBtn');
+        const trainingLog = document.getElementById('trainingLog');
+        const setsContainer = document.getElementById('setsContainer');
+        const addSetBtn = document.getElementById('addSetBtn');
+        const syncRestBtn = document.getElementById('syncRestBtn');
+        const syncHoldBtn = document.getElementById('syncHoldBtn');
+        const reminderIntervalDisplay = document.getElementById('reminderIntervalDisplay');
+        const decreaseReminderBtn = document.getElementById('decreaseReminderBtn');
+        const increaseReminderBtn = document.getElementById('increaseReminderBtn');
+        
+        // Sections
+        const settingsSection = document.getElementById('settingsSection');
+        const timerSection = document.getElementById('timerSection');
+        const logSection = document.getElementById('logSection');
+        
+        // Collapsible headers
+        const instructionsHeader = document.getElementById('instructionsHeader');
+        const instructionsContent = document.getElementById('instructionsContent');
+        const settingsHeader = document.getElementById('settingsHeader');
+        const settingsContent = document.getElementById('settingsContent');
+        const setsHeader = document.getElementById('setsHeader');
+        const setsContent = document.getElementById('setsContent');
+        const logHeader = document.getElementById('logHeader');
+        const logContent = document.getElementById('logContent');
+        
+        // Warm-up elements
+        const warmUpEnabled = document.getElementById('warmUpEnabled');
+        const skipWarmUpBtn = document.getElementById('skipWarmUpBtn');
+        const skipWarmUpBtnContainer = document.getElementById('skipWarmUpBtnContainer');
+        const warmup60Btn = document.getElementById('warmup60Btn');
+        const warmup120Btn = document.getElementById('warmup120Btn');
+        
+        // Preset buttons
+        const presetBtnA2 = document.getElementById('presetBtnA2');
+        const presetBtnA3 = document.getElementById('presetBtnA3');
+        
+        // Timer variables
+        let timer = null;
+        let isRunning = false;
+        let currentTime = 0;
+        let currentSet = -1; // Start at -1 for warm-up phase
+        let isHoldPhase = true;
+        let sets = [];
+        let timeSpeed = 1;
+        let lastReminderTime = 0;
+        let reminderIntervalValue = 30; // Default to 30 seconds
+        let isVoiceEnabled = true;
+        let isEncouragementEnabled = false; // Default to false as requested
+        let totalRemainingTime = 0;
+        let lastSpokenTime = 0; // Track last time spoken for speed adjustments
+        let isWarmUpEnabled = true;
+        let warmUpTime = 120; // Default 2 minutes
+        let isWarmUpPhase = false;
+        let justSwitchedPhase = false;
+        let isSyncRestActive = false;
+        let isSyncHoldActive = false;
+        let waitingForSpeech = false;
+        
+        // Store collapsible states
+        let collapsibleStates = {
+            instructions: true,
+            settings: true,
+            sets: true,
+            log: true
+        };
+        
+        // Encouraging messages
+        const encouragingMessages = [
+            "保持冷靜，你做得很好！",
+            "專注呼吸，你已經完成了一半！",
+            "堅持住，你比想像中更強大！",
+            "放鬆心情，你的表現太棒了！",
+            "繼續保持，你快成功了！",
+            "深呼吸，你的毅力令人驚嘆！",
+            "你的進步很明顯，繼續加油！",
+            "保持節奏，你正在突破自己！",
+            "專注當下，你已經超越了昨天的自己！"
+        ];
+        
+        // Toggle collapsible sections
+        function toggleCollapsible(header, content, stateKey) {
+            header.addEventListener('click', () => {
+                const isOpen = content.classList.contains('open');
+                if (isOpen) {
+                    content.classList.remove('open');
+                    header.querySelector('i').classList.remove('fa-chevron-up');
+                    header.querySelector('i').classList.add('fa-chevron-down');
+                    collapsibleStates[stateKey] = false;
+                } else {
+                    content.classList.add('open');
+                    header.querySelector('i').classList.remove('fa-chevron-down');
+                    header.querySelector('i').classList.add('fa-chevron-up');
+                    collapsibleStates[stateKey] = true;
+                }
+            });
+        }
+        
+        // Initialize collapsible sections
+        function initCollapsibles() {
+            toggleCollapsible(instructionsHeader, instructionsContent, 'instructions');
+            toggleCollapsible(settingsHeader, settingsContent, 'settings');
+            toggleCollapsible(setsHeader, setsContent, 'sets');
+            toggleCollapsible(logHeader, logContent, 'log');
+            
+            // Set initial states
+            if (collapsibleStates.instructions) {
+                instructionsContent.classList.add('open');
+                instructionsHeader.querySelector('i').classList.remove('fa-chevron-down');
+                instructionsHeader.querySelector('i').classList.add('fa-chevron-up');
+            } else {
+                instructionsContent.classList.remove('open');
+            }
+            
+            if (collapsibleStates.settings) {
+                settingsContent.classList.add('open');
+                settingsHeader.querySelector('i').classList.remove('fa-chevron-down');
+                settingsHeader.querySelector('i').classList.add('fa-chevron-up');
+            } else {
+                settingsContent.classList.remove('open');
+            }
+            
+            if (collapsibleStates.sets) {
+                setsContent.classList.add('open');
+                setsHeader.querySelector('i').classList.remove('fa-chevron-down');
+                setsHeader.querySelector('i').classList.add('fa-chevron-up');
+            } else {
+                setsContent.classList.remove('open');
+            }
+            
+            if (collapsibleStates.log) {
+                logContent.classList.add('open');
+                logHeader.querySelector('i').classList.remove('fa-chevron-down');
+                logHeader.querySelector('i').classList.add('fa-chevron-up');
+            } else {
+                logContent.classList.remove('open');
+            }
+        }
+        
+        // Hide all sections except timer when training starts
+        function hideSettingsDuringTraining() {
+            settingsSection.style.display = 'none';
+            logSection.style.display = 'none';
+        }
+        
+        // Show all sections when training stops
+        function showSettingsAfterTraining() {
+            settingsSection.style.display = 'block';
+            logSection.style.display = 'block';
+            
+            // Restore previous collapsible states
+            if (collapsibleStates.instructions) {
+                instructionsContent.classList.add('open');
+                instructionsHeader.querySelector('i').classList.remove('fa-chevron-down');
+                instructionsHeader.querySelector('i').classList.add('fa-chevron-up');
+            } else {
+                instructionsContent.classList.remove('open');
+                instructionsHeader.querySelector('i').classList.remove('fa-chevron-up');
+                instructionsHeader.querySelector('i').classList.add('fa-chevron-down');
+            }
+            
+            if (collapsibleStates.settings) {
+                settingsContent.classList.add('open');
+                settingsHeader.querySelector('i').classList.remove('fa-chevron-down');
+                settingsHeader.querySelector('i').classList.add('fa-chevron-up');
+            } else {
+                settingsContent.classList.remove('open');
+                settingsHeader.querySelector('i').classList.remove('fa-chevron-up');
+                settingsHeader.querySelector('i').classList.add('fa-chevron-down');
+            }
+            
+            if (collapsibleStates.sets) {
+                setsContent.classList.add('open');
+                setsHeader.querySelector('i').classList.remove('fa-chevron-down');
+                setsHeader.querySelector('i').classList.add('fa-chevron-up');
+            } else {
+                setsContent.classList.remove('open');
+                setsHeader.querySelector('i').classList.remove('fa-chevron-up');
+                setsHeader.querySelector('i').classList.add('fa-chevron-down');
+            }
+            
+            if (collapsibleStates.log) {
+                logContent.classList.add('open');
+                logHeader.querySelector('i').classList.remove('fa-chevron-down');
+                logHeader.querySelector('i').classList.add('fa-chevron-up');
+            } else {
+                logContent.classList.remove('open');
+                logHeader.querySelector('i').classList.remove('fa-chevron-up');
+                logHeader.querySelector('i').classList.add('fa-chevron-down');
+            }
+        }
+        
+        // Initialize with default sets (A2 preset)
+        function initializeSets() {
+            // Clear existing sets
+            setsContainer.innerHTML = '';
+            
+            // Apply A2 preset (初學組)
+            applyPreset('A2');
+        }
+        
+        // Apply preset configurations
+        function applyPreset(preset) {
+            // Clear existing sets
+            setsContainer.innerHTML = '';
+            
+            let holdTimes = [];
+            let restTimes = [];
+            
+            switch(preset) {
+                case 'A2':
+                    // 初學組(適用A2): 6組，閉氣1分鐘，休息2分鐘遞減15秒
+                    holdTimes = Array(6).fill(60); // 6 sets of 60 seconds hold
+                    restTimes = [120, 105, 90, 75, 60, 45]; // Starting at 120 seconds, decreasing by 15 seconds
+                    break;
+                case 'A3':
+                    // 進階組(適用A3): 8組，閉氣2分鐘，休息2分鐘遞減15秒
+                    holdTimes = Array(8).fill(120); // 8 sets of 120 seconds hold
+                    restTimes = [120, 105, 90, 75, 60, 45, 30, 15]; // Starting at 120 seconds, decreasing by 15 seconds
+                    break;
+                default:
+                    holdTimes = [60, 45, 30, 15];
+                    restTimes = [60, 60, 60, 60];
+            }
+            
+            for (let i = 0; i < holdTimes.length; i++) {
+                addSet(holdTimes[i], restTimes[i]); // Use the specified hold and rest times
+            }
+            
+            logTraining(`已套用${preset === 'A2' ? '初學組 (A2)' : '進階組 (A3)'}`);
+        }
+        
+        // Add a new set
+        function addSet(holdTime = 30, restTime = 60) {
+            // Check if we've reached the maximum number of sets (8)
+            if (document.querySelectorAll('.set-card').length >= 8) {
+                alert('最多只能有 8 組訓練');
+                return;
+            }
+            
+            const setIndex = document.querySelectorAll('.set-card').length;
+            const setCard = document.createElement('div');
+            setCard.className = 'set-card card rounded-lg p-3 relative';
+            
+            setCard.innerHTML = `
+                <div class="absolute top-2 right-2">
+                    <button class="remove-set-btn text-red-400 hover:text-red-600">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <h3 class="text-md font-semibold mb-2">第 ${setIndex + 1} 組</h3>
+                <div class="space-y-2">
+                    <div>
+                        <label class="block text-sm mb-1">閉氣時間 (秒)</label>
+                        <div class="flex items-center">
+                            <button class="time-adjust-btn btn bg-blue-700 hover:bg-blue-800 text-white rounded-l-lg decrease-hold">-</button>
+                            <input type="number" class="hold-time-input time-input" value="${holdTime}" min="5" max="300">
+                            <button class="time-adjust-btn btn bg-blue-700 hover:bg-blue-800 text-white rounded-r-lg increase-hold">+</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">休息時間 (秒)</label>
+                        <div class="flex items-center">
+                            <button class="time-adjust-btn btn bg-green-700 hover:bg-green-800 text-white rounded-l-lg decrease-rest">-</button>
+                            <input type="number" class="rest-time-input time-input" value="${restTime}" min="0" max="300">
+                            <button class="time-adjust-btn btn bg-green-700 hover:bg-green-800 text-white rounded-r-lg increase-rest">+</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            setsContainer.appendChild(setCard);
+            
+            // Add event listener to remove button
+            const removeBtn = setCard.querySelector('.remove-set-btn');
+            removeBtn.addEventListener('click', () => {
+                if (document.querySelectorAll('.set-card').length > 4) {
+                    setCard.remove();
+                    updateSetNumbers();
+                } else {
+                    alert('至少需要 4 組訓練');
+                }
+            });
+            
+            // Add event listeners for time adjustment buttons and inputs
+            const holdTimeInput = setCard.querySelector('.hold-time-input');
+            const restTimeInput = setCard.querySelector('.rest-time-input');
+            const decreaseHoldBtn = setCard.querySelector('.decrease-hold');
+            const increaseHoldBtn = setCard.querySelector('.increase-hold');
+            const decreaseRestBtn = setCard.querySelector('.decrease-rest');
+            const increaseRestBtn = setCard.querySelector('.increase-rest');
+            
+            // Hold time input change
+            holdTimeInput.addEventListener('change', () => {
+                let value = parseInt(holdTimeInput.value) || 0;
+                
+                // Validate input
+                if (value < 5) value = 5;
+                if (value > 300) value = 300;
+                
+                holdTimeInput.value = value;
+                
+                if (isSyncHoldActive) {
+                    syncAllHoldTimes(value);
+                }
+            });
+            
+            // Rest time input change
+            restTimeInput.addEventListener('change', () => {
+                let value = parseInt(restTimeInput.value) || 0;
+                
+                // Validate input
+                if (value < 0) value = 0;
+                if (value > 300) value = 300;
+                
+                restTimeInput.value = value;
+                
+                if (isSyncRestActive) {
+                    syncAllRestTimes(value);
+                }
+            });
+            
+            decreaseHoldBtn.addEventListener('click', () => {
+                let currentValue = parseInt(holdTimeInput.value) || 0;
+                if (currentValue >= 10) {
+                    const newValue = currentValue - 5;
+                    holdTimeInput.value = newValue;
+                    if (isSyncHoldActive) {
+                        syncAllHoldTimes(newValue);
+                    }
+                }
+            });
+            
+            increaseHoldBtn.addEventListener('click', () => {
+                let currentValue = parseInt(holdTimeInput.value) || 0;
+                const newValue = currentValue + 5;
+                holdTimeInput.value = newValue > 300 ? 300 : newValue;
+                if (isSyncHoldActive) {
+                    syncAllHoldTimes(newValue);
+                }
+            });
+            
+            decreaseRestBtn.addEventListener('click', () => {
+                let currentValue = parseInt(restTimeInput.value) || 0;
+                if (currentValue >= 5) {
+                    const newValue = currentValue - 5;
+                    restTimeInput.value = newValue;
+                    if (isSyncRestActive) {
+                        syncAllRestTimes(newValue);
+                    }
+                }
+            });
+            
+            increaseRestBtn.addEventListener('click', () => {
+                let currentValue = parseInt(restTimeInput.value) || 0;
+                const newValue = currentValue + 5;
+                restTimeInput.value = newValue > 300 ? 300 : newValue;
+                if (isSyncRestActive) {
+                    syncAllRestTimes(newValue);
+                }
+            });
+        }
+        
+        // Sync all rest times
+        function syncAllRestTimes(seconds) {
+            if (!isSyncRestActive) return;
+            
+            const setCards = document.querySelectorAll('.set-card');
+            setCards.forEach(card => {
+                card.querySelector('.rest-time-input').value = seconds;
+            });
+        }
+        
+        // Sync all hold times
+        function syncAllHoldTimes(seconds) {
+            if (!isSyncHoldActive) return;
+            
+            const setCards = document.querySelectorAll('.set-card');
+            setCards.forEach(card => {
+                card.querySelector('.hold-time-input').value = seconds;
+            });
+        }
+        
+        // Toggle sync rest button
+        function toggleSyncRest() {
+            isSyncRestActive = !isSyncRestActive;
+            
+            if (isSyncRestActive) {
+                syncRestBtn.classList.add('active');
+                // Get the first set's rest time and sync all others
+                const firstSetCard = document.querySelector('.set-card');
+                if (firstSetCard) {
+                    const firstRestTime = parseInt(firstSetCard.querySelector('.rest-time-input').value) || 60;
+                    syncAllRestTimes(firstRestTime);
+                }
+            } else {
+                syncRestBtn.classList.remove('active');
+            }
+        }
+        
+        // Toggle sync hold button
+        function toggleSyncHold() {
+            isSyncHoldActive = !isSyncHoldActive;
+            
+            if (isSyncHoldActive) {
+                syncHoldBtn.classList.add('active');
+                // Get the first set's hold time and sync all others
+                const firstSetCard = document.querySelector('.set-card');
+                if (firstSetCard) {
+                    const firstHoldTime = parseInt(firstSetCard.querySelector('.hold-time-input').value) || 30;
+                    syncAllHoldTimes(firstHoldTime);
+                }
+            } else {
+                syncHoldBtn.classList.remove('active');
+            }
+        }
+        
+        // Update set numbers after removal
+        function updateSetNumbers() {
+            const setCards = document.querySelectorAll('.set-card');
+            setCards.forEach((card, index) => {
+                card.querySelector('h3').textContent = `第 ${index + 1} 組`;
+            });
+            updateProgressDisplay();
+        }
+        
+        // Collect set data from UI
+        function collectSets() {
+            const setCards = document.querySelectorAll('.set-card');
+            const newSets = [];
+            
+            setCards.forEach(card => {
+                const holdTime = parseInt(card.querySelector('.hold-time-input').value) || 0;
+                const restTime = parseInt(card.querySelector('.rest-time-input').value) || 0;
+                
+                newSets.push({ holdTime, restTime });
+            });
+            
+            return newSets;
+        }
+        
+        // Calculate total remaining time
+        function calculateTotalRemainingTime() {
+            let total = currentTime; // Current phase time
+            
+            // If in warm-up phase
+            if (currentSet === -1) {
+                // Add all sets after warm-up
+                for (let i = 0; i < sets.length; i++) {
+                    total += sets[i].holdTime;
+                    // Add rest time except for the last set
+                    if (i < sets.length - 1) {
+                        total += sets[i].restTime;
+                    }
+                }
+                return total;
+            }
+            
+            if (isHoldPhase) {
+                // Add current set's rest time if not the last set
+                if (currentSet < sets.length - 1) {
+                    total += sets[currentSet].restTime;
+                }
+                
+                // Add remaining sets
+                for (let i = currentSet + 1; i < sets.length; i++) {
+                    total += sets[i].holdTime;
+                    // Add rest time except for the last set
+                    if (i < sets.length - 1) {
+                        total += sets[i].restTime;
+                    }
+                }
+            } else {
+                // Add remaining sets starting from next set
+                for (let i = currentSet + 1; i < sets.length; i++) {
+                    total += sets[i].holdTime;
+                    // Add rest time except for the last set
+                    if (i < sets.length - 1) {
+                        total += sets[i].restTime;
+                    }
+                }
+            }
+            
+            return total;
+        }
+        
+        // Format time as MM:SS
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            return `${mins}:${secs}`;
+        }
+        
+        // Update progress display
+        function updateProgressDisplay() {
+            const totalSets = sets.length || document.querySelectorAll('.set-card').length;
+            
+            if (currentSet === -1) {
+                progressDisplay.textContent = `調息組`;
+                progressBar.style.width = `0%`;
+            } else {
+                progressDisplay.textContent = `組數: ${currentSet + 1} / ${totalSets}`;
+                const progress = ((currentSet + 1) / totalSets) * 100;
+                progressBar.style.width = `${progress}%`;
+            }
+            
+            // Update total remaining time
+            if (isRunning) {
+                totalRemainingTime = calculateTotalRemainingTime();
+                totalTimeDisplay.textContent = `總剩餘時間: ${formatTime(totalRemainingTime)}`;
+            }
+        }
+        
+        // Get random encouraging message
+        function getRandomEncouragingMessage() {
+            return encouragingMessages[Math.floor(Math.random() * encouragingMessages.length)];
+        }
+        
+        // Get available voices
+        function getVoices() {
+            return new Promise(resolve => {
+                let voices = speechSynthesis.getVoices();
+                if (voices.length) {
+                    resolve(voices);
+                    return;
+                }
+                
+                const voiceschanged = () => {
+                    voices = speechSynthesis.getVoices();
+                    resolve(voices);
+                    speechSynthesis.removeEventListener('voiceschanged', voiceschanged);
+                };
+                
+                speechSynthesis.addEventListener('voiceschanged', voiceschanged);
+            });
+        }
+        
+        // Speak with selected voice
+        async function speak(text, forceSpeak = false) {
+            if (!window.speechSynthesis || !isRunning) return;
+            
+            // Check if we should speak based on time speed
+            const currentTimeInMs = Date.now();
+            if (!forceSpeak) {
+                // For faster speeds, only speak if enough time has passed
+                const minTimeBetweenSpeech = 1000; // 1 second minimum between speech
+                if (currentTimeInMs - lastSpokenTime < minTimeBetweenSpeech) {
+                    return; // Skip this speech if too soon after last one
+                }
+            }
+            
+            // Cancel any ongoing speech
+            speechSynthesis.cancel();
+            
+            return new Promise(resolve => {
+                const voices = speechSynthesis.getVoices();
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = 'zh-TW';
+                
+                // Find appropriate voice
+                let selectedVoice = null;
+                
+                // Try to find a Chinese voice first
+                for (const voice of voices) {
+                    if (voice.lang.includes('zh') || voice.lang.includes('cmn')) {
+                        selectedVoice = voice;
+                        break;
+                    }
+                }
+                
+                // If no Chinese voice, use any available voice
+                if (selectedVoice) {
+                    utterance.voice = selectedVoice;
+                }
+                
+                // Make voice more natural based on context
+                if (text.includes('開始調息')) {
+                    utterance.text = '開始調息，請放鬆並保持自然呼吸';
+                } else if (text.includes('開始閉氣')) {
+                    utterance.text = '深吸一口氣，現在開始閉氣';
+                    if (isEncouragementEnabled) {
+                        utterance.text += '。保持冷靜，你可以的！';
+                    }
+                } else if (text.includes('休息')) {
+                    utterance.text = '很好，現在可以呼吸了，休息一下';
+                } else if (text.includes('訓練完成')) {
+                    utterance.text = '太棒了！你已經完成了所有訓練，做得非常好！';
+                } else if (text.includes('還剩')) {
+                    // Add encouraging message if enabled
+                    if (isEncouragementEnabled) {
+                        const encouragingMsg = getRandomEncouragingMessage();
+                        utterance.text = `${text}。${encouragingMsg}`;
+                    } else {
+                        utterance.text = text;
+                    }
+                } else if (text.includes('第')) {
+                    // Add set information with encouragement if enabled
+                    if (isEncouragementEnabled) {
+                        utterance.text = `${text}，繼續保持，你做得很棒！`;
+                    } else {
+                        utterance.text = text;
+                    }
+                } else {
+                    utterance.text = text;
+                }
+                
+                utterance.onend = () => {
+                    waitingForSpeech = false;
+                    resolve();
+                };
+                
+                utterance.onerror = () => {
+                    waitingForSpeech = false;
+                    resolve();
+                };
+                
+                waitingForSpeech = true;
+                speechSynthesis.speak(utterance);
+                lastSpokenTime = currentTimeInMs;
+            });
+        }
+        
+        // Skip warm-up phase
+        async function skipWarmUp() {
+            if (currentSet === -1 && isRunning) {
+                // Clear the existing timer
+                clearInterval(timer);
+                timer = null;
+                
+                isWarmUpPhase = false;
+                currentSet = 0;
+                isHoldPhase = true;
+                currentTime = sets[0].holdTime;
+                lastReminderTime = currentTime;
+                justSwitchedPhase = true;
+                
+                stateDisplay.textContent = '閉氣';
+                stateDisplay.classList.remove('text-blue-400');
+                stateDisplay.classList.add('text-yellow-400');
+                
+                updateProgressDisplay();
+                logTraining('跳過調息組');
+                
+                // Wait for speech to complete before starting timer
+                await speak('跳過調息，開始閉氣', true);
+                
+                // Start a new timer
+                timer = setInterval(updateTimer, 1000 / timeSpeed);
+                skipWarmUpBtnContainer.style.display = 'none';
+            }
+        }
+        
+        // Reset timer
+        function resetTimer() {
+            // Stop any running timer
+            if (timer) {
+                clearInterval(timer);
+                timer = null;
+            }
+            
+            isRunning = false;
+            waitingForSpeech = false;
+            
+            // Reset UI
+            startBtn.innerHTML = '<i class="fas fa-play mr-1"></i> 開始';
+            startBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+            startBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            
+            skipWarmUpBtnContainer.style.display = 'none';
+            stateDisplay.textContent = '準備開始';
+            stateDisplay.classList.remove('text-yellow-400', 'text-green-400', 'text-blue-400');
+            timerDisplay.textContent = "00:00";
+            totalTimeDisplay.textContent = "總剩餘時間: 00:00";
+            progressBar.style.width = "0%";
+            
+            // Reset all variables
+            currentTime = 0;
+            currentSet = -1;
+            isHoldPhase = true;
+            isWarmUpPhase = false;
+            totalRemainingTime = 0;
+            justSwitchedPhase = false;
+            
+            // Update progress display with current number of sets
+            const totalSets = document.querySelectorAll('.set-card').length;
+            progressDisplay.textContent = `組數: 0 / ${totalSets}`;
+            
+            // Add pulse animation back to start button
+            startBtn.classList.add('pulse-animation');
+            
+            // Log reset
+            logTraining('訓練重置');
+            
+            // Cancel any ongoing speech
+            if (window.speechSynthesis) {
+                speechSynthesis.cancel();
+            }
+            
+            // Show settings sections again
+            showSettingsAfterTraining();
+        }
+        
+        // Start/Stop timer
+        async function toggleTimer() {
+            // If timer is already running, stop it
+            if (isRunning) {
+                resetTimer();
+                return;
+            }
+            
+            // Save current collapsible states before hiding
+            collapsibleStates = {
+                instructions: instructionsContent.classList.contains('open'),
+                settings: settingsContent.classList.contains('open'),
+                sets: setsContent.classList.contains('open'),
+                log: logContent.classList.contains('open')
+            };
+            
+            // Hide settings during training
+            hideSettingsDuringTraining();
+            
+            // Check if warm-up is enabled
+            isWarmUpEnabled = warmUpEnabled.checked;
+            
+            // Remove pulse animation from start button
+            startBtn.classList.remove('pulse-animation');
+            
+            // Collect set data
+            sets = collectSets();
+            
+            if (sets.length < 4) {
+                alert('至少需要 4 組訓練');
+                showSettingsAfterTraining(); // Show settings again if validation fails
+                return;
+            }
+            
+            // Validate inputs
+            for (let i = 0; i < sets.length; i++) {
+                if (sets[i].holdTime <= 0) {
+                    alert(`第 ${i + 1} 組的閉氣時間必須大於0秒`);
+                    showSettingsAfterTraining(); // Show settings again if validation fails
+                    return;
+                }
+                
+                if (sets[i].restTime < 0 || sets[i].restTime > 300) {
+                    alert(`第 ${i + 1} 組的休息時間必須在0-300秒之間`);
+                    showSettingsAfterTraining(); // Show settings again if validation fails
+                    return;
+                }
+            }
+            
+            // Reset variables
+            isRunning = true;
+            
+            if (isWarmUpEnabled) {
+                currentSet = -1; // Start with warm-up phase
+                isWarmUpPhase = true;
+                currentTime = warmUpTime;
+                skipWarmUpBtnContainer.style.display = 'block';
+            } else {
+                currentSet = 0;
+                isWarmUpPhase = false;
+                currentTime = sets[0].holdTime;
+                skipWarmUpBtnContainer.style.display = 'none';
+            }
+            
+            isHoldPhase = true;
+            lastReminderTime = currentTime;
+            justSwitchedPhase = true; // Set flag to prevent immediate reminder
+            totalRemainingTime = calculateTotalRemainingTime();
+            
+            // Clear log
+            trainingLog.innerHTML = '';
+            
+            logTraining('訓練開始');
+            
+            // Update UI
+            startBtn.innerHTML = '<i class="fas fa-stop mr-1"></i> 停止';
+            startBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+            startBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+            
+            if (isWarmUpPhase) {
+                stateDisplay.textContent = '調息';
+                stateDisplay.classList.add('text-blue-400');
+                stateDisplay.classList.remove('text-yellow-400', 'text-green-400');
+            } else {
+                stateDisplay.textContent = '閉氣';
+                stateDisplay.classList.add('text-yellow-400');
+                stateDisplay.classList.remove('text-blue-400', 'text-green-400');
+            }
+            
+            updateProgressDisplay();
+            
+            // Start countdown with speech
+            await speak('準備開始', true);
+            
+            if (!isRunning) return; // Check if timer was stopped during speech
+            
+            if (isWarmUpPhase) {
+                await speak('開始調息', true);
+            } else {
+                await speak('開始閉氣', true);
+            }
+            
+            if (!isRunning) return; // Check if timer was stopped during speech
+            
+            // Make sure any previous timer is cleared
+            if (timer) {
+                clearInterval(timer);
+            }
+            
+            // Start a new timer
+            timer = setInterval(updateTimer, 1000 / timeSpeed);
+        }
+        
+        // Update timer
+        async function updateTimer() {
+            if (!isRunning || waitingForSpeech) return; // Safety check
+            
+            currentTime--;
+            timerDisplay.textContent = formatTime(currentTime);
+            
+            // Update total remaining time
+            totalRemainingTime--;
+            totalTimeDisplay.textContent = `總剩餘時間: ${formatTime(totalRemainingTime)}`;
+            
+            // Reset the justSwitchedPhase flag after 3 seconds
+            if (justSwitchedPhase && (lastReminderTime - currentTime) >= 3) {
+                justSwitchedPhase = false;
+            }
+            
+            // Check for reminder (only if not just switched phases)
+            if (!justSwitchedPhase && 
+                reminderIntervalValue > 0 && 
+                (lastReminderTime - currentTime) >= reminderIntervalValue) {
+                await speak(`還剩 ${currentTime} 秒`);
+                lastReminderTime = currentTime;
+            }
+            
+            // Countdown voice alerts for last 10 seconds
+            if (currentTime <= 10 && currentTime > 0) {
+                await speak(currentTime.toString());
+            }
+            
+            // Time's up
+            if (currentTime <= 0) {
+                // Pause the timer while speaking
+                clearInterval(timer);
+                timer = null;
+                
+                // If in warm-up phase
+                if (currentSet === -1) {
+                    // Move to the first set
+                    isWarmUpPhase = false;
+                    currentSet = 0;
+                    isHoldPhase = true;
+                    currentTime = sets[0].holdTime;
+                    lastReminderTime = currentTime;
+                    justSwitchedPhase = true;
+                    
+                    stateDisplay.textContent = '閉氣';
+                    stateDisplay.classList.remove('text-blue-400');
+                    stateDisplay.classList.add('text-yellow-400');
+                    
+                    updateProgressDisplay();
+                    logTraining('調息完成，開始第 1 組');
+                    skipWarmUpBtnContainer.style.display = 'none';
+                    
+                    // Wait for speech to complete before continuing
+                    await speak('調息完成，開始閉氣', true);
+                    
+                    if (isRunning) {
+                        // Restart the timer
+                        timer = setInterval(updateTimer, 1000 / timeSpeed);
+                    }
+                    return;
+                }
+                
+                if (isHoldPhase) {
+                    // Completed a hold phase
+                    isHoldPhase = false;
+                    logTraining(`完成第 ${currentSet + 1} 組閉氣`);
+                    
+                    // Check if all sets are completed
+                    if (currentSet >= sets.length - 1) {
+                        isRunning = false;
+                        
+                        // Reset button to start
+                        startBtn.innerHTML = '<i class="fas fa-play mr-1"></i> 開始';
+                        startBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                        startBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+                        
+                        stateDisplay.textContent = '訓練完成!';
+                        stateDisplay.classList.remove('text-yellow-400', 'text-blue-400');
+                        stateDisplay.classList.add('text-green-400');
+                        
+                        // Add pulse animation back to start button
+                        startBtn.classList.add('pulse-animation');
+                        
+                        await speak('訓練完成', true);
+                        
+                        // Show settings sections again
+                        showSettingsAfterTraining();
+                        return;
+                    }
+                    
+                    // Switch to rest phase
+                    currentTime = sets[currentSet].restTime;
+                    lastReminderTime = currentTime;
+                    justSwitchedPhase = true; // Set flag to prevent immediate reminder
+                    stateDisplay.textContent = '休息 (一次全呼吸)';
+                    stateDisplay.classList.remove('text-yellow-400');
+                    stateDisplay.classList.add('text-green-400');
+                    
+                    // Wait for speech to complete before continuing
+                    await speak('休息', true);
+                    
+                    if (isRunning) {
+                        // Restart the timer
+                        timer = setInterval(updateTimer, 1000 / timeSpeed);
+                    }
+                } else {
+                    // Completed a rest phase, switch to hold phase
+                    currentSet++;
+                    isHoldPhase = true;
+                    currentTime = sets[currentSet].holdTime;
+                    lastReminderTime = currentTime;
+                    justSwitchedPhase = true; // Set flag to prevent immediate reminder
+                    stateDisplay.textContent = '閉氣';
+                    stateDisplay.classList.remove('text-green-400');
+                    stateDisplay.classList.add('text-yellow-400');
+                    updateProgressDisplay();
+                    
+                    // Wait for speech to complete before continuing
+                    await speak(`第 ${currentSet + 1} 組`, true);
+                    await speak('開始閉氣', true);
+                    
+                    if (isRunning) {
+                        // Restart the timer
+                        timer = setInterval(updateTimer, 1000 / timeSpeed);
+                    }
+                }
+            }
+        }
+        
+        // Log training events
+        function logTraining(message) {
+            const logItem = document.createElement('div');
+            logItem.className = 'p-1 bg-opacity-20 bg-white rounded';
+            
+            const time = new Date().toLocaleTimeString();
+            logItem.textContent = `[${time}] ${message}`;
+            
+            if (trainingLog.firstChild && trainingLog.firstChild.textContent === '尚無訓練記錄') {
+                trainingLog.innerHTML = '';
+            }
+            
+            trainingLog.prepend(logItem);
+        }
+        
+        // Update reminder interval
+        function updateReminderInterval(change) {
+            let interval = reminderIntervalValue + change;
+            
+            // Ensure interval is between 0 and 60
+            if (interval < 0) interval = 0;
+            if (interval > 60) interval = 60;
+            
+            reminderIntervalValue = interval;
+            reminderIntervalDisplay.textContent = interval === 0 ? '關閉' : `${interval}`;
+        }
+        
+        // Set warm-up time
+        function setWarmUpTime(seconds) {
+            warmUpTime = seconds;
+            
+            // Update active state on warm-up buttons
+            if (seconds === 60) {
+                warmup60Btn.classList.add('active');
+                warmup120Btn.classList.remove('active');
+            } else {
+                warmup60Btn.classList.remove('active');
+                warmup120Btn.classList.add('active');
+            }
+            
+            logTraining(`調息時間設為 ${seconds / 60} 分鐘`);
+        }
+        
+        // Add touch effect to preset buttons
+        function addTouchEffect(button) {
+            button.addEventListener('mousedown', () => {
+                button.classList.add('bg-blue-800');
+                button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            });
+            
+            button.addEventListener('mouseup', () => {
+                button.classList.remove('bg-blue-800');
+                button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            });
+            
+            button.addEventListener('mouseleave', () => {
+                button.classList.remove('bg-blue-800');
+                button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            });
+            
+            // Touch events for mobile
+            button.addEventListener('touchstart', () => {
+                button.classList.add('bg-blue-800');
+                button.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+            });
+            
+            button.addEventListener('touchend', () => {
+                button.classList.remove('bg-blue-800');
+                button.classList.add('bg-blue-600', 'hover:bg-blue-700');
+            });
+        }
+        
+        // Event listeners
+        startBtn.addEventListener('click', toggleTimer);
+        skipWarmUpBtn.addEventListener('click', skipWarmUp);
+        addSetBtn.addEventListener('click', () => {
+            if (document.querySelectorAll('.set-card').length < 8) {
+                addSet();
+            } else {
+                alert('最多只能有 8 組訓練');
+            }
+        });
+        
+        // Sync buttons
+        syncRestBtn.addEventListener('click', toggleSyncRest);
+        syncHoldBtn.addEventListener('click', toggleSyncHold);
+        
+        // Warm-up time selection
+        warmup60Btn.addEventListener('click', () => setWarmUpTime(60));
+        warmup120Btn.addEventListener('click', () => setWarmUpTime(120));
+        
+        // Preset buttons
+        presetBtnA2.addEventListener('click', () => applyPreset('A2'));
+        presetBtnA3.addEventListener('click', () => applyPreset('A3'));
+        
+        // Add touch effects to preset buttons
+        addTouchEffect(presetBtnA2);
+        addTouchEffect(presetBtnA3);
+        
+        // Warm-up toggle
+        warmUpEnabled.addEventListener('change', () => {
+            isWarmUpEnabled = warmUpEnabled.checked;
+            logTraining(`調息組已${isWarmUpEnabled ? '開啟' : '關閉'}`);
+        });
+        
+        // Reminder interval buttons
+        decreaseReminderBtn.addEventListener('click', () => updateReminderInterval(-5));
+        increaseReminderBtn.addEventListener('click', () => updateReminderInterval(5));
+        
+        // Initialize
+        initializeSets();
+        initCollapsibles();
+        updateProgressDisplay();
+        
+        // Set initial timer display
+        timerDisplay.textContent = "00:00";
+        totalTimeDisplay.textContent = "總剩餘時間: 00:00";
+    </script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96f73812f5338454',t:'MTc1NTI0NTQ2My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
