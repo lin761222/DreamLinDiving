@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>霖哥製作-自潛CO2訓練表</title>
     <script src="https://cdn.tailwindcss.com"></script>
+	<script src="https://www.youtube.com/iframe_api"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
@@ -393,6 +394,20 @@
                 box-shadow: 0 0 0 0 rgba(255, 193, 7, 0);
             }
         }
+		
+		.card {
+    /* 新增以下備用樣式 */
+    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.input-field {
+    /* 新增以下備用樣式 */
+    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
     </style>
 </head>
 <body class="p-4">
@@ -560,6 +575,25 @@
                     </div>
                 </div>
             </div>
+			
+			<div id="youtubePlayerSection" class="card rounded-xl p-4 md:col-span-3">
+    <div class="collapsible-header" id="youtubeHeader">
+        <h2 class="text-lg font-semibold">YouTube 音樂播放器</h2>
+        <div class="flex items-center">
+            <span class="text-sm mr-2">點擊即可縮合</span>
+            <i class="fas fa-chevron-up"></i>
+        </div>
+    </div>
+    <div class="collapsible-content open" id="youtubeContent">
+        <div class="flex flex-col md:flex-row items-center gap-3 mb-4">
+            <input type="text" id="youtubeUrlInput" class="input-field flex-grow px-3 py-2 rounded-lg text-sm" placeholder="請輸入 YouTube 網址或影片 ID" value="https://www.youtube.com/watch?v=C3onqgzKjjY&list=RDC3onqgzKjjY&start_radio=1">
+            <button id="loadYoutubeBtn" class="btn bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg flex-shrink-0">
+                <i class="fab fa-youtube mr-1"></i> 載入影片
+            </button>
+        </div>
+        <div id="youtubePlayer" class="relative w-full aspect-video rounded-lg overflow-hidden"></div>
+    </div>
+</div>
         </div>
         
         <!-- Footer with training log -->
@@ -580,6 +614,74 @@
     </div>
     
     <script>
+	// YouTube Player Variables
+let player;
+const youtubeUrlInput = document.getElementById('youtubeUrlInput');
+const loadYoutubeBtn = document.getElementById('loadYoutubeBtn');
+const youtubePlayerDiv = document.getElementById('youtubePlayer');
+
+// YouTube collapsible section
+const youtubeHeader = document.getElementById('youtubeHeader');
+const youtubeContent = document.getElementById('youtubeContent');
+
+// 監聽 YouTube API 載入完成事件
+function onYouTubeIframeAPIReady() {
+    // 播放器會在使用者點擊 "載入影片" 時初始化
+    console.log("YouTube Iframe API is ready.");
+}
+
+// 從 URL 或 ID 擷取影片 ID
+function getYouTubeVideoId(url) {
+    let videoId = null;
+    const urlRegex = /(?:youtu\.be\/|youtube\.com\/(?:watch\?.*v=|embed\/|v\/|shorts\/))([^?&"'>]+)/;
+    const match = url.match(urlRegex);
+    if (match && match[1]) {
+        videoId = match[1];
+    } else if (url.length === 11) { // 檢查是否為影片ID
+        videoId = url;
+    }
+    return videoId;
+}
+
+// 載入並播放 YouTube 影片
+function loadVideo() {
+    const url = youtubeUrlInput.value;
+    const videoId = getYouTubeVideoId(url);
+
+    if (videoId) {
+        // 清除舊的播放器
+        if (player) {
+            player.destroy();
+        }
+        
+        // 創建新的播放器
+        player = new YT.Player('youtubePlayer', {
+            videoId: videoId,
+            playerVars: {
+                'autoplay': 1, // 嘗試自動播放
+                'playsinline': 1, // 讓 iOS 內嵌播放
+                'controls': 1 // 顯示控制項
+            },
+            events: {
+                'onReady': onPlayerReady
+            }
+        });
+        
+        logTraining(`YouTube 影片載入: ${videoId}`);
+    } else {
+        alert('無效的 YouTube 網址或影片 ID');
+    }
+}
+
+function onPlayerReady(event) {
+    event.target.playVideo(); // 確保影片準備好後播放
+}
+
+// Event listeners
+loadYoutubeBtn.addEventListener('click', loadVideo);
+
+// Initialize collapsible state for YouTube section
+toggleCollapsible(youtubeHeader, youtubeContent, 'youtube');
         // Create bubbles
         function createBubbles() {
             const bubblesContainer = document.getElementById('bubbles');
@@ -607,6 +709,7 @@
         
         createBubbles();
         
+		
         // DOM Elements
         const timerDisplay = document.getElementById('timerDisplay');
         const stateDisplay = document.getElementById('stateDisplay');
@@ -1674,6 +1777,7 @@
         // Set initial timer display
         timerDisplay.textContent = "00:00";
         totalTimeDisplay.textContent = "總剩餘時間: 00:00";
+		
     </script>
 <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'96f73812f5338454',t:'MTc1NTI0NTQ2My4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
